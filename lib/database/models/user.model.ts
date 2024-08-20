@@ -1,3 +1,5 @@
+// lib/database/models/user.model.ts
+
 import { Schema, model, models } from "mongoose";
 
 const UserSchema = new Schema({
