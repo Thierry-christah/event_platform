@@ -16,12 +16,9 @@ const Footer = () => {
         </Link>
 
         <SignedIn>
-          <div className="flex gap-4">
+          <div className="flex gap-4 ml-[150px]">
             <div>
               <a href="/about" className="p-regular-14">About</a>
-            </div>
-            <div>
-              <a href="/about" className="p-regular-14">Contact</a>
             </div>
             <div>
               <a href="/terms" className="p-regular-14">Terms</a>
@@ -32,7 +29,7 @@ const Footer = () => {
           </div>
         </SignedIn>
 
-        <p>2024 Evently. All Rights reserved.</p>
+        <p>&copy; 2024 Evently. All Rights reserved.</p>
       </div>
     </footer>
   )
