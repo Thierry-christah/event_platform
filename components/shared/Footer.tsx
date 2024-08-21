@@ -1,3 +1,4 @@
+import { SignedIn } from "@clerk/nextjs"
 import Image from "next/image"
 import Link from "next/link"
 
@@ -14,7 +15,24 @@ const Footer = () => {
           />
         </Link>
 
-        <p>2023 Evently. All Rights reserved.</p>
+        <SignedIn>
+          <div className="flex gap-4">
+            <div>
+              <a href="/about" className="p-regular-14">About</a>
+            </div>
+            <div>
+              <a href="/about" className="p-regular-14">Contact</a>
+            </div>
+            <div>
+              <a href="/terms" className="p-regular-14">Terms</a>
+            </div>
+            <div>
+              <a href="/privacy" className="p-regular-14">Privacy</a>
+            </div>
+          </div>
+        </SignedIn>
+
+        <p>2024 Evently. All Rights reserved.</p>
       </div>
     </footer>
   )

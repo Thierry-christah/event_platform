@@ -1,3 +1,5 @@
+// lib/database/models/event.action.ts
+
 'use server'
 
 import { revalidatePath } from 'next/cache'
@@ -100,33 +102,55 @@ export async function deleteEvent({ eventId, path }: DeleteEventParams) {
 }
 
 // GET ALL EVENTS
-export async function getAllEvents({ query, limit = 6, page, category }: GetAllEventsParams) {
+export async function getAllEvents({ query, limit = 6, page, category, date }: GetAllEventsParams) {
   try {
-    await connectToDatabase()
+    await connectToDatabase();
 
-    const titleCondition = query ? { title: { $regex: query, $options: 'i' } } : {}
-    const categoryCondition = category ? await getCategoryByName(category) : null
-    const conditions = {
-      $and: [titleCondition, categoryCondition ? { category: categoryCondition._id } : {}],
+    const titleCondition = query ? { title: { $regex: query, $options: 'i' } } : {};
+    const categoryCondition = category ? await getCategoryByName(category) : null;
+
+    let dateCondition = {};
+    if (date) {
+      const startDate = new Date(date);
+      startDate.setUTCHours(0, 0, 0, 0); // Start of the day
+
+      const endDate = new Date(date);
+      endDate.setUTCHours(23, 59, 59, 999); // End of the day
+
+      dateCondition = { startDateTime: { $gte: startDate, $lte: endDate } };
+      console.log("Date Condition: ", dateCondition); // Debugging statement
     }
 
-    const skipAmount = (Number(page) - 1) * limit
-    const eventsQuery = Event.find(conditions)
-      .sort({ createdAt: 'desc' })
-      .skip(skipAmount)
-      .limit(limit)
+    const conditions = {
+      $and: [
+        titleCondition,
+        categoryCondition ? { category: categoryCondition._id } : {},
+        dateCondition,
+      ],
+    };
 
-    const events = await populateEvent(eventsQuery)
-    const eventsCount = await Event.countDocuments(conditions)
+    console.log("Final Filter Conditions: ", conditions); // Debugging statement
+
+    const skipAmount = (Number(page) - 1) * limit;
+    const eventsQuery = Event.find(conditions)
+      .sort({ startDateTime: 'asc' })
+      .skip(skipAmount)
+      .limit(limit);
+
+    const events = await populateEvent(eventsQuery);
+    const eventsCount = await Event.countDocuments(conditions);
+
+    console.log("Filtered Events: ", events); // Debugging statement
 
     return {
       data: JSON.parse(JSON.stringify(events)),
       totalPages: Math.ceil(eventsCount / limit),
-    }
+    };
   } catch (error) {
-    handleError(error)
+    handleError(error);
   }
 }
+
 
 // GET EVENTS BY ORGANIZER
 export async function getEventsByUser({ userId, limit = 6, page }: GetEventsByUserParams) {
@@ -174,5 +198,32 @@ export async function getRelatedEventsByCategory({
     return { data: JSON.parse(JSON.stringify(events)), totalPages: Math.ceil(eventsCount / limit) }
   } catch (error) {
     handleError(error)
+  }
+}
+
+// GET RELATED EVENTS: EVENTS WITH SAME DATE 
+
+export async function getAllEventDates() {
+  try {
+    await connectToDatabase();
+
+    const dates = await Event.aggregate([
+      {
+        $group: {
+          _id: {
+            $dateToString: { format: "%Y-%m-%d", date: "$startDateTime" }
+          }
+        }
+      },
+      {
+        $sort: { _id: 1 }
+      }
+    ]);
+
+    console.log("Fetched Dates from DB: ", dates); // Debugging statement
+
+    return dates.map(date => date._id);
+  } catch (error) {
+    handleError(error);
   }
 }

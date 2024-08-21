@@ -1,5 +1,6 @@
 import CategoryFilter from '@/components/shared/CategoryFilter';
 import Collection from '@/components/shared/Collection'
+import DateFilter from '@/components/shared/DateFilter';
 import Search from '@/components/shared/Search';
 import { Button } from '@/components/ui/button'
 import { getAllEvents } from '@/lib/actions/event.actions';
@@ -11,13 +12,15 @@ export default async function Home({ searchParams }: SearchParamProps) {
   const page = Number(searchParams?.page) || 1;
   const searchText = (searchParams?.query as string) || '';
   const category = (searchParams?.category as string) || '';
+  const date = (searchParams?.date as string) || ''; // Extract the date parameter
 
   const events = await getAllEvents({
     query: searchText,
     category,
     page,
-    limit: 6
-  })
+    limit: 6,
+    date, // Pass the extracted date here
+  });
 
   return (
     <>
@@ -49,6 +52,7 @@ export default async function Home({ searchParams }: SearchParamProps) {
         <div className="flex w-full flex-col gap-5 md:flex-row">
           <Search />
           <CategoryFilter />
+          <DateFilter />
         </div>
 
         <Collection 
@@ -64,3 +68,4 @@ export default async function Home({ searchParams }: SearchParamProps) {
     </>
   )
 }
+

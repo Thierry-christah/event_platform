@@ -1,3 +1,5 @@
+// types/index.ts
+
 // ====== USER PARAMS
 export type CreateUserParams = {
   clerkId: string
@@ -61,6 +63,7 @@ export type GetAllEventsParams = {
   category: string
   limit: number
   page: number
+  date: string
 }
 
 export type GetEventsByUserParams = {

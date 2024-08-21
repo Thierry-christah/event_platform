@@ -1,3 +1,5 @@
+// lib/actions/category.actions.ts
+
 "use server"
 
 import { CreateCategoryParams } from "@/types"

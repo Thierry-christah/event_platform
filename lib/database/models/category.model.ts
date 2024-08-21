@@ -1,3 +1,5 @@
+// lib/database/models/category.model.ts
+
 import { Document, Schema, model, models } from "mongoose";
 
 export interface ICategory extends Document {
